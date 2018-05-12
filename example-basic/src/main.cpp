@@ -2,6 +2,18 @@
 
 	ofxWinMenu basic example
 
+	==== updated ====
+	creative commons 2018 Nontrivial Studio
+	updated by Aaron BocANEGRA
+	tested in Windows 10 x64
+	Visual Studio 2017
+	openFrameworks 0.98
+
+	<https://github.com/abocanegra/ofxWinMenu>
+
+	=========================================================================
+
+	==== Original ====
 	Copyright (C) 2016 Lynn Jarvis.
 
 	http://www.spout.zeal.co

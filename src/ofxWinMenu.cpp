@@ -4,6 +4,18 @@
 
 	Create a menu for a Microsoft Windows Openframeworks application.
 	
+	==== updated ====
+	creative commons 2018 Nontrivial Studio
+	updated by Aaron BocANEGRA
+	tested in Windows 10 x64
+	Visual Studio 2017
+	openFrameworks 0.98
+
+	<https://github.com/abocanegra/ofxWinMenu>
+
+	=========================================================================
+
+	==== Original ====
 	Copyright (C) 2016 Lynn Jarvis.
 
 	https://github.com/leadedge
@@ -39,17 +51,19 @@ static LRESULT CALLBACK ofxWinMenuWndProc(HWND, UINT, WPARAM, LPARAM); // Local 
 static WNDPROC ofAppWndProc; // Openframeworks application window message procedure
 static ofxWinMenu *pThis; // Pointer to access the ofxWinMenu class from the window procedure
 
-
-ofxWinMenu::ofxWinMenu(ofApp *app, HWND hwnd) {
+ofxWinMenu::ofxWinMenu(ofApp *app, HWND Ahwnd) {
+	IsTopMost = true;
 
 	g_hMenu = NULL; // Set by CreateMenu and returned to ofApp
 	pAppMenuFunction = NULL; // Set by CreateMenuFunction to return menu state to ofApp
 
 	// The window handle of ofApp
-	g_hwnd = hwnd;
+	g_hwnd = Ahwnd;
 
 	pThis = this; // Pointer for access the ofxWinMenu class
 	pApp = app; // The ofApp class pointer
+	window = pApp->window;
+	screen = pApp->screen;
 
 	// Save the Openframeworks application window message procedure
 	ofAppWndProc = (WNDPROC)GetWindowLongPtrA(g_hwnd, GWL_WNDPROC);
@@ -59,7 +73,7 @@ ofxWinMenu::ofxWinMenu(ofApp *app, HWND hwnd) {
 
 	// Set the Menu name
 	SetClassLongA(g_hwnd, GCL_MENUNAME, (LONG)"ofxWinMenu"); 
-
+	DoTopMost(IsTopMost);
 }
 
 ofxWinMenu::~ofxWinMenu()
@@ -69,7 +83,6 @@ ofxWinMenu::~ofxWinMenu()
 	itemIDs.clear();
 	autoCheck.clear();
 	isChecked.clear();
-
 }
 
 //
@@ -173,6 +186,8 @@ bool ofxWinMenu::AddPopupSeparator(HMENU hSubMenu)
 // Set the menu to the application
 bool ofxWinMenu::SetWindowMenu()
 {
+	window = ofGetWindowRect();
+
 	if(g_hwnd && g_hMenu)
 		return (bool)SetMenu(g_hwnd, g_hMenu);
 	else
@@ -182,12 +197,29 @@ bool ofxWinMenu::SetWindowMenu()
 // Remove the menu from the application
 bool ofxWinMenu::RemoveWindowMenu()
 {
+	window = ofGetWindowRect();
+
 	if(g_hwnd)
 		return (bool)SetMenu(g_hwnd, NULL);
 	else
 		return false;
 }
 
+// Toggle Revove / Setup Menu
+bool ofxWinMenu::ToggleWindowMenu(bool TopMost=false) {
+	window = ofGetWindowRect();
+
+	bool bFull = ofGetWindowMode();
+	if (bFull) {
+		ofHideCursor();
+		return RemoveWindowMenu();
+	}
+	else {
+		DoTopMost(TopMost);
+		ofShowCursor();
+		return SetWindowMenu();
+	}
+}
 // Destroy the menu - not normally used
 bool ofxWinMenu::DestroyWindowMenu()
 {
@@ -197,6 +229,25 @@ bool ofxWinMenu::DestroyWindowMenu()
 		return false;
 }
 
+void ofxWinMenu::DoTopMost(bool TopMost=false) {
+	IsTopMost = TopMost;
+	if (TopMost) {
+		// get the current top window for return
+		pApp->hWndForeground = GetForegroundWindow();
+		// Set this window topmost
+		SetWindowPos(pApp->hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		ShowWindow(pApp->hWnd, SW_SHOW);
+	}
+	else {
+		SetWindowPos(pApp->hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		ShowWindow(pApp->hWnd, SW_SHOW);
+		// Reset the window that was topmost before
+		if (GetWindowLong(pApp->hWndForeground, GWL_EXSTYLE) & WS_EX_TOPMOST)
+			SetWindowPos(pApp->hWndForeground, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		else
+			SetWindowPos(pApp->hWndForeground, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	}
+}
 
 // Check or uncheck a menu item
 bool ofxWinMenu::SetPopupItem(string ItemName, bool bChecked)

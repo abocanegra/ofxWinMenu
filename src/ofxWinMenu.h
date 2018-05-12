@@ -11,7 +11,7 @@
 	Visual Studio 2017
 	openFrameworks 0.98
 
-	https:/github.com/abocanegra/ofxWinMenu
+	<https://github.com/abocanegra/ofxWinMenu>
 
 	=========================================================================  
 
@@ -38,7 +38,26 @@
     =========================================================================
 
 */
+
 #pragma once
+
+//-------------------------------
+#define OF_VERSION			("OF_0.9.8")
+//-------------------------------
+
+//-------------------------------
+//  find the system type --------
+//-------------------------------
+
+#if defined( __WIN32__ ) || defined( _WIN32 )
+#define TARGET_WIN32
+#define WIN32_HIGH_RES_TIMING
+#elif defined( __APPLE_CC__)
+#define TARGET_OSX
+#else
+#define TARGET_LINUX
+#endif
+//-------------------------------
 
 class ofApp; // Forward declaration
 
@@ -46,7 +65,7 @@ class ofxWinMenu {
 
 	public:
 
-		ofxWinMenu(ofApp *app, HWND hwnd);
+		ofxWinMenu(ofApp *app, HWND Ahwnd);
 		~ofxWinMenu();
 
 		HWND g_hwnd; // ofApp window
@@ -57,7 +76,6 @@ class ofxWinMenu {
 
 		// Popup menu of the main menu
 		HMENU AddPopupMenu(HMENU hMenu, string menuName);
-
 		// Popup menu items
 		bool AddPopupItem(HMENU hSubMenu, string ItemName);
 		bool AddPopupItem(HMENU hSubMenu, string ItemName, bool bChecked);
@@ -69,6 +87,9 @@ class ofxWinMenu {
 
 		// Remove the menu but do not destroy it
 		bool RemoveWindowMenu();
+
+		// Toggle Setup Remove Menu
+		bool ToggleWindowMenu(bool TopMost);
 
 		// Destroy the menu
 		bool DestroyWindowMenu();
@@ -85,11 +106,17 @@ class ofxWinMenu {
 		ofApp *pApp; // Pointer to access the ofApp class
 		void(ofApp::*pAppMenuFunction)(string title, bool bChecked); // The ofApp menu function
 
+		void DoTopMost(bool TopMost);
+		bool IsTopMost;
+
+		HWND hWnd; // Application window
+		HWND hWndForeground; // current foreground window
+		ofRectangle window, screen;
+
 		// Menu item data
 		vector<string> itemNames; // Name of the menu item
 		vector<HMENU> subMenus;   // Submenu containing the menu item
 		vector<int> itemIDs;      // Position of the item in the submenu
 		vector<bool> autoCheck;   // Check the menu item on and off
 		vector<bool> isChecked;   // Item checked flag
-
 };

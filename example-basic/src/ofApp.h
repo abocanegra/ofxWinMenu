@@ -2,6 +2,18 @@
 
 	ofxWinMenu basic example - ofApp.h
 
+	==== updated ====
+	creative commons 2018 Nontrivial Studio
+	updated by Aaron BocANEGRA
+	tested in Windows 10 x64
+	Visual Studio 2017
+	openFrameworks 0.98
+
+	<https://github.com/abocanegra/ofxWinMenu>
+
+	=========================================================================
+
+	==== Original ====
 	Copyright (C) 2016-2017 Lynn Jarvis.
 
 	http://www.spout.zeal.co
@@ -21,13 +33,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	=========================================================================
 	This program has been updated for use as an example for ofxWin Minu
-	<http://github.com/abocanegra/ofxWinMenu> by Aaron Bocanegra of Nontrivial Studio
+	<https://github.com/abocanegra/ofxWinMenu> by Aaron Bocanegra of Nontrivial Studio
 	cc 2018
 */
 
 #pragma once
 
 #include "ofMain.h"
+
 #include "ofxWinMenu.h" // Menu addon
 
 class ofApp : public ofBaseApp {
@@ -48,16 +61,20 @@ class ofApp : public ofBaseApp {
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-		// Menu
-		ofxWinMenu * menu; // Menu object
-		void appMenuFunction(string title, bool bChecked); // Menu return function
-
+		// then the the platform specific includes:
+		#ifdef TARGET_WIN32
+			// Menu
+			ofxWinMenu * menu; // Menu object
+			void appMenuFunction(string title, bool bChecked); // Menu return function
+			HWND hWnd; // Application window
+			HWND hWndForeground; // current foreground window
+        #endif
+		void	setupMenu();
 		// Used by example app
 		ofTrueTypeFont myFont;
         ofImage myImage;
-		float windowWidth, windowHeight;
-		HWND hWnd; // Application window
-		HWND hWndForeground; // current foreground window
+		ofRectangle window;
+		ofRectangle screen;
 
 		// Example menu variables
 		bool bShowInfo;
@@ -65,7 +82,5 @@ class ofApp : public ofBaseApp {
 		bool bTopmost;
 
 		// Example functions
- 		void doFullScreen(bool bFull);
-		void doTopmost(bool bTop);
-
+		//void doTopmost(bool bTop);
 };
